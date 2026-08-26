@@ -16,13 +16,13 @@ export class CreateTaskUseCase {
     if (typeof title !== 'string' || !title.trim()) {
       throw new ValidationError('El campo "title" es obligatorio.');
     }
-    if (description !== undefined && description !== null && typeof description !== 'string') {
-      throw new ValidationError('El campo "description" debe ser un texto.');
+    if (typeof description !== 'string' || !description.trim()) {
+      throw new ValidationError('El campo "description" es obligatorio.');
     }
 
     return this.tasks.create({
       title: title.trim(),
-      description: typeof description === 'string' ? description.trim() : null,
+      description: description.trim(),
     });
   }
 }

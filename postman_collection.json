@@ -1,0 +1,188 @@
+{
+  "info": {
+    "name": "Reto GEEST - API de gestión de tareas",
+    "description": "Colección para probar la API REST del Reto GEEST (Node.js + TypeScript, arquitectura hexagonal).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "POST /users - Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juan\",\n  \"lastName\": \"Perez\",\n  \"email\": \"juan.perez@example.com\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] }
+          }
+        },
+        {
+          "name": "GET /users - Listar usuarios",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] }
+          }
+        },
+        {
+          "name": "GET /users/:idUser/tasks - Tareas de un usuario",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/1/tasks",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "1", "tasks"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "POST /tasks - Crear tarea",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Preparar informe mensual\",\n  \"description\": \"Consolidar métricas del mes y enviarlo al equipo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/tasks", "host": ["{{baseUrl}}"], "path": ["tasks"] }
+          }
+        },
+        {
+          "name": "POST /tasks - Error: falta title",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Consolidar métricas del mes y enviarlo al equipo\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/tasks", "host": ["{{baseUrl}}"], "path": ["tasks"] },
+            "description": "Debe responder 400 con error.code = VALIDATION_ERROR (\"El campo \\\"title\\\" es obligatorio.\")"
+          }
+        },
+        {
+          "name": "POST /tasks - Error: falta description",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Preparar informe mensual\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/tasks", "host": ["{{baseUrl}}"], "path": ["tasks"] },
+            "description": "Debe responder 400 con error.code = VALIDATION_ERROR (\"El campo \\\"description\\\" es obligatorio.\")"
+          }
+        },
+        {
+          "name": "GET /tasks - Listar tareas",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tasks?status=open",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks"],
+              "query": [
+                { "key": "status", "value": "open", "description": "opcional: open | archived" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /tasks/:idTask - Obtener tarea",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tasks/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", "1"]
+            }
+          }
+        },
+        {
+          "name": "POST /tasks/:idTask/assign - Asignar usuarios",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userIds\": [1, 2, 3]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/1/assign",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", "1", "assign"]
+            }
+          }
+        },
+        {
+          "name": "POST /tasks/:idTask/complete - Completar parte del usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Idempotency-Key", "value": "{{$guid}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": 1\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tasks/1/complete",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", "1", "complete"]
+            }
+          }
+        },
+        {
+          "name": "GET /tasks/:idTask/notifications - Intentos de notificación",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/tasks/1/notifications",
+              "host": ["{{baseUrl}}"],
+              "path": ["tasks", "1", "notifications"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

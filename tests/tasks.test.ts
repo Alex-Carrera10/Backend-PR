@@ -20,14 +20,14 @@ async function createUser(email: string) {
   return res.body.id as number;
 }
 
-async function createTask(title = 'Tarea de prueba') {
-  const res = await request(app).post('/tasks').send({ title });
+async function createTask(title = 'Tarea de prueba', description = 'Descripción de prueba') {
+  const res = await request(app).post('/tasks').send({ title, description });
   return res.body.id as number;
 }
 
 describe('POST /tasks', () => {
   it('crea una tarea en estado "open"', async () => {
-    const res = await request(app).post('/tasks').send({ title: 'Nueva tarea' });
+    const res = await request(app).post('/tasks').send({ title: 'Nueva tarea', description: 'Detalle' });
     expect(res.status).toBe(201);
     expect(res.body.status).toBe('open');
     expect(typeof res.body.id).toBe('number');
@@ -39,10 +39,10 @@ describe('POST /tasks', () => {
     expect(res.body.error.code).toBe('VALIDATION_ERROR');
   });
 
-  it('permite crear una tarea sin descripción', async () => {
+  it('rechaza si falta la descripción', async () => {
     const res = await request(app).post('/tasks').send({ title: 'Sin descripción' });
-    expect(res.status).toBe(201);
-    expect(res.body.description).toBeNull();
+    expect(res.status).toBe(400);
+    expect(res.body.error.code).toBe('VALIDATION_ERROR');
   });
 });
 
@@ -188,7 +188,7 @@ describe('GET /tasks', () => {
 describe('Idempotency-Key', () => {
   it('devuelve la misma respuesta ante dos requests idénticas en paralelo', async () => {
     const key = `key-${Date.now()}`;
-    const body = { title: 'Tarea idempotente' };
+    const body = { title: 'Tarea idempotente', description: 'Detalle' };
 
     const [r1, r2] = await Promise.all([
       request(app).post('/tasks').set('Idempotency-Key', key).send(body),
@@ -203,8 +203,11 @@ describe('Idempotency-Key', () => {
 
   it('rechaza la misma key con un body diferente', async () => {
     const key = `key-${Date.now()}`;
-    await request(app).post('/tasks').set('Idempotency-Key', key).send({ title: 'A' });
-    const res = await request(app).post('/tasks').set('Idempotency-Key', key).send({ title: 'B' });
+    await request(app).post('/tasks').set('Idempotency-Key', key).send({ title: 'A', description: 'Detalle' });
+    const res = await request(app)
+      .post('/tasks')
+      .set('Idempotency-Key', key)
+      .send({ title: 'B', description: 'Detalle' });
 
     expect(res.status).toBe(409);
   });

@@ -47,7 +47,7 @@ describe('GET /users', () => {
     const user = await request(app)
       .post('/users')
       .send({ name: 'Ana', lastName: 'Pérez', email: 'ana@example.com' });
-    const task = await request(app).post('/tasks').send({ title: 'Tarea 1' });
+    const task = await request(app).post('/tasks').send({ title: 'Tarea 1', description: 'Detalle' });
     await request(app).post(`/tasks/${task.body.id}/assign`).send({ userIds: [user.body.id] });
 
     const res = await request(app).get('/users');
@@ -64,7 +64,7 @@ describe('GET /users/:idUser/tasks', () => {
     const user = await request(app)
       .post('/users')
       .send({ name: 'Ana', lastName: 'Pérez', email: 'ana@example.com' });
-    const task = await request(app).post('/tasks').send({ title: 'Tarea 1' });
+    const task = await request(app).post('/tasks').send({ title: 'Tarea 1', description: 'Detalle' });
     await request(app).post(`/tasks/${task.body.id}/assign`).send({ userIds: [user.body.id] });
     await request(app).post(`/tasks/${task.body.id}/complete`).send({ userId: user.body.id });
 
