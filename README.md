@@ -63,8 +63,13 @@ Hexagonal para que el dominio (reglas de asignación/archivado) no dependa de Ex
 
 ## Despliegue
 
-- **URL pública**: _(completar tras el deploy)_
-- **Dónde**: Render (Web Service, free tier), conectado directo al repo de GitHub.
+- **URL pública**: https://backend-pr-um60.onrender.com
+- **Dónde**: Render (Web Service, free tier), conectado directo al repo de GitHub (`main`, auto-deploy en cada push).
 - **Por qué**: deploy sin Docker/CLI, HTTPS automático, `git push` dispara el redeploy. Contraparte: el free tier "duerme" tras inactividad — el primer request tras dormir puede tardar ~30-50s.
 - **Base de datos**: Supabase (Postgres gestionado, free tier).
-- **Cómo acceder**: cualquier cliente HTTP contra la URL pública + los endpoints documentados arriba (ver también `GET /health`).
+- **Cómo acceder**: cualquier cliente HTTP contra la URL pública, por ejemplo:
+  - `GET https://backend-pr-um60.onrender.com/health`
+  - `GET https://backend-pr-um60.onrender.com/tasks`
+  - `POST https://backend-pr-um60.onrender.com/users`
+
+  Ver el resto de endpoints documentados arriba, o la colección de Postman (`postman_collection.json`) incluida en el repo.
